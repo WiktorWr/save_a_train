@@ -16,7 +16,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_04_104844) do
 
   # Custom types defined in this database.
   # Note that some types may not work with other database engines. Be careful if changing database.
-  create_enum "content_type", ["draft", "published"]
   create_enum "status", ["draft", "published"]
 
   create_table "contents", force: :cascade do |t|

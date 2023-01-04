@@ -52,3 +52,9 @@ Layout/HashAlignment:
 
 Naming/VariableNumber:
   Enabled: false
+
+Rails/SkipsModelValidations:
+  Enabled: false
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false

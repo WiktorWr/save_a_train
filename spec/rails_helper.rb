@@ -9,7 +9,7 @@ Dir["./spec/support/**/*.rb"].each { |f| require f }
 ActiveRecord::Migration.maintain_test_schema!
 
 RspecApiDocumentation.configure do |config|
-  config.format = :json
+  config.format = :html
 end
 
 RSpec.configure do |config|

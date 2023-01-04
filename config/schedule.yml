@@ -1,0 +1,5 @@
+publish_worker:
+  name: "PublishWorker - every 10 minutes"
+  cron: "*/10 * * * *"
+  class: PublishWorker
+  queue: default

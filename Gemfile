@@ -18,7 +18,8 @@ gem "sprockets-rails"
 gem "sentry-rails"
 gem "sentry-ruby"
 gem "sentry-sidekiq"
-gem "sidekiq"
+gem "sidekiq", "< 7"
+gem "sidekiq-cron"
 gem "sidekiq-unique-jobs"
 
 group :development do
