@@ -1,0 +1,17 @@
+default: &default
+  adapter: postgresql
+  host: localhost
+  port: 5432
+  pool: 5
+  timeout: 5000
+  user: save_a_train
+  password: save_a_train
+
+development:
+  <<: *default
+  database: save_a_train_development
+
+test:
+  <<: *default
+  database: save_a_train_test
+  host: postgres

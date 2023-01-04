@@ -1,0 +1,61 @@
+image: ruby:3.1
+services:
+  - postgres:14-alpine
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - vendor/ruby
+
+variables:
+  POSTGRES_USER: save_a_train
+  POSTGRES_PASSWORD: save_a_train
+
+before_script:
+
+  - gem install --no-document bundler
+  - bundle install -j $(nproc) --path vendor
+
+rubocop:
+  stage: test
+  script:
+    - bundle exec rubocop
+
+rspec:
+  stage: test
+  script:
+    - RAILS_ENV=test bundle exec rake db:create
+    - RAILS_ENV=test bundle exec rake db:migrate
+    - RAILS_ENV=test bundle exec rspec --format RspecJunitFormatter --out junit.xml
+  artifacts:
+    reports:
+      junit: junit.xml
+      cobertura: coverage/coverage.xml
+
+audit:
+  stage: test
+  script:
+    - bundle exec bundler-audit check --update
+    - bundle exec brakeman -q
+
+staging:
+  stage: deploy
+  environment: staging
+  only:
+    - master
+  script:
+    # See Encoding section of https://hub.docker.com/_/ruby
+    # to see why we have to do this
+    - "which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )"
+    - "which rsync || ( apt-get update -y && apt-get install rsync -y )"
+    - eval $(ssh-agent -s)
+    - echo "${SSH_PRIVATE_KEY_BASE64}" |  tr -d " " | base64 --decode | ssh-add -
+    - mkdir -p ~/.ssh
+    - "[[ -f /.dockerenv ]] && echo -e 'Host * \\n\\tStrictHostKeyChecking no\\n\\n' > ~/.ssh/config"
+    - export LANG=C.UTF-8
+    - bundle exec mina staging deploy
+    - RAILS_ENV=test bundle exec rake db:create
+    - RAILS_ENV=test bundle exec rake db:migrate
+    - RAILS_ENV=test bundle exec rails docs:generate
+    - rsync -avuz $CI_PROJECT_DIR/doc/api/ save_a_train@INSERT-ADDRESS-HERE:~/save_a_train/current/doc/api/
+    - bundle exec mina staging puma:restart
