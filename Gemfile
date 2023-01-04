@@ -72,5 +72,6 @@ group :development, :test, :staging do
   gem "apitome"
   gem "factory_bot"
   gem "factory_bot_rails"
+  gem "faker"
   gem "rspec_api_documentation"
 end
